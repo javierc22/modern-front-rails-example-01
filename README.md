@@ -121,6 +121,11 @@
   rails g devise user
   ~~~
 
+- Generate devise views
+  ~~~
+  rails generate devise:views
+  ~~~
+
 ## Front End Gems
 
 - Verificar que las siguientes gemas estén en el Gemfile
@@ -136,6 +141,14 @@
 
   La herramienta cssbundling-rails es un poco más complicada. La herramienta de línea de comandos de Tailwind tiene dos versiones, una de las cuales utiliza Node.js y la otra es un binario independiente específico de la plataforma. Actualmente, Rails ofrece herramientas separadas para cada versión; la herramienta cssbundling-rails asume que tienes Node.js instalado y estás utilizando una herramienta de empaquetado basada en Node.js. Dado que especificamos esbuild, Rails asume que queremos la herramienta basada en Node.js, por lo que nos da cssbundling-rails. Si estuviéramos utilizando importmap-rails, nos daría la gema tailwind-rails, que construye CSS utilizando el binario independiente de Tailwind.
 
+## Agregando TypeScript
+
+En este punto, tenemos una configuración completamente funcional de Rails 7 para comenzar a escribir código frontend. Podríamos detenernos aquí. Sin embargo, en lugar de eso, vamos a agregar TypeScript a nuestra mezcla.
+Hay buenas y malas noticias sobre el uso de TypeScript con esbuild. La buena noticia es que esbuild convertirá los archivos .ts de TypeScript a JavaScript sin necesidad de cambios de configuración de nuestra parte. La mala noticia es que todo lo que hace esbuild es eliminar las anotaciones de tipo de TypeScript y cualquier otra cosa específica de TypeScript que pueda existir en el archivo. Específicamente, esbuild no ejecuta el compilador de TypeScript para determinar si el código es seguro desde el punto de vista de los tipos. Dado que queremos usar TypeScript específicamente para determinar si nuestro código es seguro desde el punto de vista de los tipos, esto parece menos que ideal.
+Lo que queremos hacer es incorporar el compilador de TypeScript a nuestro proceso de construcción vigilado. La documentación de esbuild dice "aún deberás ejecutar tsc -noEmit en paralelo con esbuild para verificar los tipos", pero no ofrece orientación sobre cómo hacerlo.
+Aquí entra en juego el paquete tsc-watch12, que ejecuta el compilador de TypeScript en modo de observación y nos permite especificar qué hacer en caso de éxito y de fallo.
+Vamos a instalarlo:
+
 - Add Typescript
   ~~~
   yarn add --dev typescript tsc-watch
@@ -144,3 +157,50 @@
 
   yarn add --dev @typescript-eslint/eslint-plugin
   ~~~
+
+## Definición Scripts en package.json
+
+En este momento, necesitamos actualizar nuestros scripts de desarrollo para usar tsc-watch. Los nuevos scripts se ven así:
+
+~~~json
+  "scripts": {
+    "build:js": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds",
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css",
+    "failure:js": "rm ./app/assets/builds/application.js && rm ./app/assets/builds/application.js.map",
+    "dev": "tsc-watch --noClear -p tsconfig.json --onSuccess \"yarn build:js\" --onFailure \"yarn failure:js\""
+  },
+~~~
+
+He cambiado el nombre de la tarea de construcción a build:js para que sea paralela a build:css, pero el cambio importante es el nuevo comando dev que llama a tsc-watch.
+
+Estoy llamando a tsc-watch con cuatro argumentos:
+
+- `noClear`, que evita que tsc-watch limpie la ventana de la consola. (Me gustaría hacerlo yo mismo, muchas gracias).
+
+- `-p tsconfig.json`, que apunta al archivo de configuración de TypeScript que rige la compilación que quiero realizar.
+
+- `--onSuccess \"yarn build:js\"`, que controla qué sucede si la compilación de TypeScript tiene éxito. En nuestro caso, queremos que ocurra la compilación regular de esbuild: build:js, ya que ahora sabemos que el código es seguro desde el punto de vista de los tipos.
+
+- `--onFailure \"yarn failure:js\"`, que controla qué sucede si la compilación de TypeScript falla. Supongo que tenía opciones aquí, pero lo que elegí hacer es el script failure.js, es decir, rm ./app/assets/builds/application.js && rm ./app/assets/builds/application.js.map, lo que significa eliminar los archivos existentes de esbuild del directorio de construcción para que la página del navegador de desarrollo muestre un error en lugar de devolver las compilaciones exitosas más recientes. Pensé que permitir que la compilación más reciente exitosa permaneciera podría ser confuso.
+
+Para que esto funcione, necesitamos que el comando dev reemplace a build.js en el archivo Procfile:
+
+~~~
+web: bin/rails server -p 3000
+js: yarn dev
+css: yarn build:css --watch
+~~~
+
+Y eso funciona. yarn dev llama a tsc-watch, que se configura automáticamente como un observador, así que no necesitamos hacerlo nuevamente aquí.
+
+Cuando cambia un archivo relevante, se activa tsc-watch y ejecuta el compilador de TypeScript. Si la compilación es exitosa y solo si es exitosa, se llama a esbuild para agrupar el código en una forma compatible con el navegador. Si la compilación falla, entonces eliminamos la compilación exitosa anterior. El mensaje de error va a la consola y suponemos que corregimos el error.
+
+En este momento, si intentamos esto, obtenemos el siguiente error:
+
+~~~
+error TS18003: No inputs were found in config file '/Users/noel/projects/pragmatic/north_by_sev- en /tsconfig.json'.
+Specified 'include' paths were '["**/*"]' and 'exclude' paths were '["**/*.spec.ts","node_modules","vendor","public"]'.
+~~~
+
+TypeScript se queja porque no hay archivos de TypeScript para compilar. Para lidiar con esto por el momento, cambié el nombre del archivo `hello_controller.js` a `hello_controller.ts`, lo cual satisface al compilador por ahora. Cuando comencemos a escribir nuestros propios archivos de TypeScript, el problema desaparecerá. Y ahora Rails está configurado para usar TypeScript.
+
