@@ -10,4 +10,15 @@ class Ticket < ApplicationRecord
     purchased: "purchased",
     refunded: "refunded"
   }
+
+  def toggle_for(user)
+    return unless user
+    return if self.user && self.user != user
+    case status
+    when "unsold"
+      update(status: "held", user: user)
+    when "held"
+      update(status: "unsold", user: user)
+    end
+  end
 end
