@@ -4,5 +4,5 @@
 
 import { application } from "./application"
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
+import FavoriteToggleController from "./favorite_toggle_controller"
+application.register("favorite-toggle", FavoriteToggleController)
