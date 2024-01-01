@@ -1,7 +1,10 @@
-import { Controller } from "@hotwired/stimulus";
+import { Controller } from "@hotwired/stimulus"
 
 export default class FavoriteToggleController extends Controller {
-  toggle({ params: { text } }): void {
-    console.log(text)
+  static targets = ["elementToHide"]
+  elementToHideTarget: HTMLElement
+
+  toggle(): void {
+    this.elementToHideTarget.classList.toggle("hidden")
   }
 }
