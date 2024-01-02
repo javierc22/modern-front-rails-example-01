@@ -9,10 +9,16 @@ interface RowProps {
 const Row = (props: RowProps): React.ReactElement => {
   const seatItems = Array.from(Array(props.seatsPerRow).keys()).map(
     (seatNumber) => {
-      return <Seat key={seatNumber} seatNumber={seatNumber} />
+      return (
+        <Seat
+          key={seatNumber}
+          seatNumber={seatNumber}
+          initialStatus="unsold"
+        />
+      )
     }
   )
-  return <tr className="h-20">{seatItems}</tr> 
+  return <tr className="h-20">{seatItems}</tr>
 }
 
 export default Row
