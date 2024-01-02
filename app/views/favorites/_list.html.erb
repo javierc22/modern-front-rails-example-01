@@ -1,10 +1,14 @@
 <%= turbo_frame_tag("favorite-concerts") do %>
-  <section class="my-4" data-controller="favorite-toggle">
+  <section
+      class="my-4"
+      data-controller="favorite-toggle"
+      data-favorite-toggle-visible-value="true">
     <div class="text-3xl font-bold">
       Favorite Concerts
       <button
-        class="<%= SimpleForm.button_class %> py-1 text-xl font-semibold"
-        data-action="click->favorite-toggle#toggle">
+          class="<%= SimpleForm.button_class %> py-1 text-xl font-semibold"
+          data-favorite-toggle-target="elementWithText"
+          data-action="click->favorite-toggle#toggle">
         Hide
       </button>
     </div>
