@@ -204,3 +204,9 @@ Specified 'include' paths were '["**/*"]' and 'exclude' paths were '["**/*.spec.
 
 TypeScript se queja porque no hay archivos de TypeScript para compilar. Para lidiar con esto por el momento, cambié el nombre del archivo `hello_controller.js` a `hello_controller.ts`, lo cual satisface al compilador por ahora. Cuando comencemos a escribir nuestros propios archivos de TypeScript, el problema desaparecerá. Y ahora Rails está configurado para usar TypeScript.
 
+## Instalar React JS
+
+Agregar React a la aplicación:
+~~~
+yarn add react react-dom @babel/preset-react @types/react @types/react-dom
+~~~
