@@ -9,3 +9,25 @@
 .is-closed {
   transform: rotate(-90deg);
 }
+
+.slow-transition {
+  transition: all 0.5s ease-in-out;
+}
+
+.blue-hover {
+  transition: all 0.3s ease-in-out;
+}
+
+.blue-hover:hover {
+  background-color: blue !important;
+}
+
+.resizer {
+  transition: all 1s ease-in-out;
+  max-height: 1000px;
+  overflow: hidden;
+}
+
+.resizer.shrink {
+  max-height: 0px;
+}

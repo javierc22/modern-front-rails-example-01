@@ -2,12 +2,12 @@
   <section
       class="my-4"
       data-controller="css"
-      data-css-css-class="hidden"
+      data-css-css-class="shrink"
       data-css-status-value="false">
     <div class="text-3xl font-bold">
       Favorite Concerts
       <button
-          class="<%= SimpleForm.button_class %>"
+          class="<%= SimpleForm.button_class %> blue-hover"
           data-controller="css-flip"
           data-css-flip-status-value="true"
           data-css-flip-off-class="is-closed"
@@ -17,12 +17,12 @@
               "chevron-right.svg",
               width: 25,
               height: 25,
-              class: "inline mb-3",
+              class: "inline mb-3 slow-transition",
               "data-css-flip-target": "elementToChange"
             ) %>
       </button>
     </div>
-    <div data-css-target="elementToChange">
+    <div data-css-target="elementToChange" class="resizer">
       <div class="text-xl font-bold" id="no-favorites">
         <% if current_user.favorites.empty? %>
           No favorite concerts yet
