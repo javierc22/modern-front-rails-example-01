@@ -204,9 +204,34 @@ Specified 'include' paths were '["**/*"]' and 'exclude' paths were '["**/*.spec.
 
 TypeScript se queja porque no hay archivos de TypeScript para compilar. Para lidiar con esto por el momento, cambié el nombre del archivo `hello_controller.js` a `hello_controller.ts`, lo cual satisface al compilador por ahora. Cuando comencemos a escribir nuestros propios archivos de TypeScript, el problema desaparecerá. Y ahora Rails está configurado para usar TypeScript.
 
-## Instalar React JS
+## Instalando React JS
 
 Agregar React a la aplicación:
 ~~~
 yarn add react react-dom @babel/preset-react @types/react @types/react-dom
+~~~
+
+## Instalando Animate.css
+
+Animate.css se distribuye como un paquete NPM que contiene tanto JavaScript como CSS. Aún no nos hemos encontrado con uno de estos, y vamos a necesitar realizar algunos cambios en nuestra configuración de empaquetado para acomodarlo.
+
+~~~
+yarn add animate.css
+~~~
+
+## Instalación de styled-components
+
+Dado que estamos utilizando TypeScript, debemos instalar dos paquetes.
+
+~~~
+yarn add styled-components
+
+yarn add @types/styled-components
+~~~
+
+Nota: También se puede agregar una versión específica con
+~~~
+yarn add styled-components@5.3.11
+
+yarn add @types/styled-components
 ~~~
